@@ -2,6 +2,9 @@ package Module::MapLoader;
 use strict;
 use warnings;
 
+our $VERSION = '0.001000';
+$VERSION =~ tr/_//d;
+
 sub import {
   my $class = shift;
   if (@_) {
@@ -96,3 +99,37 @@ END_CODE
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Module::MapLoader - Load modules from predefined mapping
+
+=head1 SYNOPSIS
+
+  use Module::MapLoader;
+
+=head1 DESCRIPTION
+
+Creates an L<perlvar/@INC> hook which will load modules from a predefined
+mapping, rather than searching directories.
+
+=head1 AUTHOR
+
+haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+=head1 CONTRIBUTORS
+
+None so far.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2022 the Module::MapLoader L</AUTHOR> and L</CONTRIBUTORS>
+as listed above.
+
+=head1 LICENSE
+
+This library is free software and may be distributed under the same terms
+as perl itself. See L<https://dev.perl.org/licenses/>.
+
+=cut
