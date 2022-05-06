@@ -1,4 +1,4 @@
-package HashLoader;
+package Module::MapLoader;
 use strict;
 use warnings;
 
@@ -75,7 +75,7 @@ sub files {
   return keys %{ $self->{files} };
 }
 
-sub HashLoader::INC {
+sub Module::MapLoader::INC {
   my $self = shift;
   my $file = shift;
   my $fullpath = $self->{files}{$file}
