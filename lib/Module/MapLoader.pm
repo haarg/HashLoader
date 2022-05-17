@@ -41,9 +41,11 @@ sub _find {
 sub new {
   my $class = shift;
   my %opts = @_;
-  my $self = bless {
-    files => $opts{files} || {},
-  }, $class;
+
+  my @mappings;
+  if ($opts{files}) {
+    push @mappings, $opts{files};
+  }
   if (my $mapfiles = $opts{mapfile}) {
     $mapfiles = [ $mapfiles ]
       if !ref $mapfiles;
@@ -56,16 +58,23 @@ sub new {
       }
       die $e
         if defined $e;
-      @{$self->{files}}{keys %$mapping} = values %$mapping;
+      push @mappings, $mapping;
     }
   }
   if (my $dirs = $opts{path}) {
     $dirs = [ $dirs ]
       if !ref $dirs;
     my $mapping = _find(@$dirs);
-    @{$self->{files}}{keys %$mapping} = values %$mapping;
+    push @mappings, $mapping;
   }
-  return $self;
+
+  my %files;
+  @files{keys %$_} = values %$_
+    for @mappings;
+
+  return bless {
+    files => \%files,
+  }, $class;
 }
 
 sub FILES {
