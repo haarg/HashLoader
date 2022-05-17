@@ -138,7 +138,8 @@ sub Module::MapLoader::INC {
   my $file = shift;
   my $fullpath = $self->{files}{$file}
     or return;
-  open my $fh, $fullpath
+
+  open my $fh, '<:', $fullpath
     or die "$!";
   my $prefix = sprintf <<'END_CODE', quotemeta($file), quotemeta($file), quotemeta($fullpath), $fullpath;
 BEGIN {
