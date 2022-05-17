@@ -47,6 +47,25 @@ sub _find_files {
   return \%files;
 }
 
+sub _read_pl {
+  my (@mapfiles) = @_;
+  my %mapping;
+
+  for my $mapfile (@mapfiles) {
+    my $mapping;
+    my $e;
+    {
+      local $@;
+      $mapping = do $mapfile or $e = $@ || $!;
+    }
+    die $e
+      if defined $e;
+    @mapping{keys %$mapping} = values %$mapping;
+  }
+
+  return \%mapping;
+}
+
 sub new {
   my $class = shift;
   my %opts = @_;
@@ -55,20 +74,10 @@ sub new {
   if ($opts{files}) {
     push @mappings, $opts{files};
   }
-  if (my $mapfiles = $opts{mapfile}) {
+  if (my $mapfiles = $opts{mapfile_pl}) {
     $mapfiles = [ $mapfiles ]
       if !ref $mapfiles;
-    for my $mapfile (@$mapfiles) {
-      my $mapping;
-      my $e;
-      {
-        local $@;
-        $mapping = do $mapfile or $e = $@ || $!;
-      }
-      die $e
-        if defined $e;
-      push @mappings, $mapping;
-    }
+    push @mappings, _read_pl(reverse @$mapfiles);
   }
   if (my $dirs = $opts{lib_dir}) {
     $dirs = [ $dirs ]
