@@ -66,6 +66,25 @@ sub _read_pl {
   return \%mapping;
 }
 
+sub _read_tsv {
+  my (@mapfiles) = @_;
+  my %mapping;
+
+  for my $mapfile (@mapfiles) {
+    open my $fh, '<', $mapfile
+      or die "can't read $mapfile: $!";
+    while (my $line = <$fh>) {
+      $line =~ s/\r?\n\z//;
+      my ($module, $path) = split /\t/, $line, 2;
+      die "No path given for $module in $mapfile!"
+        if !defined $path;
+      $mapping{$module} = $path;
+    }
+  }
+
+  return \%mapping;
+}
+
 sub new {
   my $class = shift;
   my %opts = @_;
@@ -78,6 +97,11 @@ sub new {
     $mapfiles = [ $mapfiles ]
       if !ref $mapfiles;
     push @mappings, _read_pl(reverse @$mapfiles);
+  }
+  if (my $mapfiles = $opts{mapfile_tsv}) {
+    $mapfiles = [ $mapfiles ]
+      if !ref $mapfiles;
+    push @mappings, _read_tsv(reverse @$mapfiles);
   }
   if (my $dirs = $opts{lib_dir}) {
     $dirs = [ $dirs ]
