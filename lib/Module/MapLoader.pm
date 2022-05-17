@@ -12,11 +12,18 @@ sub import {
   }
 }
 
-sub _find {
-  my @roots = @_;
+sub _find_files {
+  my @libs = @_;
   my %files;
 
-  for my $root (@roots) {
+  for my $lib (@libs) {
+    my %lib = ref $lib ? %$lib : (
+      path   => $lib,
+      filter => qr{\.p[lm]\z},
+    );
+    my $root = $lib{path};
+    my $filter = $lib{filter};
+
     $root =~ s{/?\z}{/};
     my @dirs = $root;
     while (my $dir = pop @dirs) {
@@ -27,10 +34,12 @@ sub _find {
         my $path = $dir . $item;
         if (-d $path) {
           push @dirs, $path . '/';
+          next;
         }
-        else {
-          $files{substr $path, length $root} = $path;
-        }
+        next
+          if $filter && $path !~ $filter;
+
+        $files{substr $path, length $root} = $path;
       }
     }
   }
@@ -61,11 +70,10 @@ sub new {
       push @mappings, $mapping;
     }
   }
-  if (my $dirs = $opts{path}) {
+  if (my $dirs = $opts{lib_dir}) {
     $dirs = [ $dirs ]
-      if !ref $dirs;
-    my $mapping = _find(@$dirs);
-    push @mappings, $mapping;
+      if ref $dirs ne 'ARRAY';
+    push @mappings, _find_files(reverse @$dirs);
   }
 
   my %files;
