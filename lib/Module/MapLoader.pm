@@ -141,6 +141,10 @@ sub Module::MapLoader::INC {
 
   open my $fh, '<:', $fullpath
     or die "$!";
+
+  # %INC entry will initially be an alias to the @INC entry, so we need to
+  # delete it before setting the correct value.
+
   my $prefix = sprintf <<'END_CODE', quotemeta($file), quotemeta($file), quotemeta($fullpath), $fullpath;
 BEGIN {
   delete $INC{"%s"};
