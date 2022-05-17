@@ -108,6 +108,11 @@ sub new {
       if ref $dirs ne 'ARRAY';
     push @mappings, _find_files(reverse @$dirs);
   }
+  if (my $dirs = $opts{blib_dir}) {
+    $dirs = [ $dirs ]
+      if ref $dirs ne 'ARRAY';
+    push @mappings, _find_files(map +("$_/lib", "$_/arch"), reverse @$dirs);
+  }
 
   my %files;
   @files{keys %$_} = values %$_
